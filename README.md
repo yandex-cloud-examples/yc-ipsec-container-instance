@@ -141,36 +141,36 @@
     * Нажать на кнопку "Создать ВМ".
 
 6. После создания ВМ, подключиться к ней по SSH, используя публичный IP-адрес, и запустить настройку `IPsec`:
-```bash
-ssh oper@<public-ip-1>
-sudo -i
-/usr/local/bin/ipsec-init.sh
-```
+    ```bash
+    ssh oper@<public-ip-1>
+    sudo -i
+    /usr/local/bin/ipsec-init.sh
+    ```
 
 7. Проверить сетевую связность между локальными ресурсами (на схеме это подсети с CIDR 192.168.x.0/24) и удаленными ресурсами (на схеме это подсети с CIDR 10.10.x.0/24).
 
 8. В случае отсутствия сетевой связности между локальными и удаленными ресурсами необходимо провести диагностику состояния `IPsec` соединения: 
-```bash
-ssh oper@<public-ip-1>
-sudo -i
-swanctl -l
-swanctl -L
-swanctl --log
-```
+    ```bash
+    ssh oper@<public-ip-1>
+    sudo -i
+    swanctl -l
+    swanctl -L
+    swanctl --log
+    ```
 
 ## Развертывание IPsec Container Instance с помощью YC-CLI <a id="cli"/></a>
 
 1. Если у вас еще нет интерфейса командной строки `YC-CLI`, [установите и инициализируйте его](https://yandex.cloud/docs/cli/quickstart#install).
 
 2. Загрузить развертывание из репозитория на [github.com](https://github.com/yandex-cloud-examples/yc-ipsec-instance):
-```bash
-git clone https://github.com/yandex-cloud-examples/yc-ipsec-instance.git
-```
+    ```bash
+    git clone https://github.com/yandex-cloud-examples/yc-ipsec-instance.git
+    ```
 
 3. Перейти в папку с развертыванием 
-```bash
-cd yc-ipsec-instance
-```
+    ```bash
+    cd yc-ipsec-instance
+    ```
 
 4. Заполнить значения параметров развертывания в файле [ipsec-cli-deploy.sh](./ipsec-cli-deploy.sh)
 
@@ -189,33 +189,31 @@ cd yc-ipsec-instance
 8. Проверить сетевую связность между локальными ресурсами (на схеме это подсети с CIDR 192.168.x.0/24) и удаленными ресурсами (на схеме это подсети с CIDR 10.10.x.0/24).
 
 9. В случае отсутствия сетевой связности между локальными и удаленными ресурсами необходимо подключиться к ВМ по SSH: 
-
-```bash
-ssh oper@<public-ip-1>
-```
+    ```bash
+    ssh oper@<public-ip-1>
+    ```
 
 и провести диагностику состояния `IPsec` соединения с помощью команд:
-
-```bash
-sudo -i
-swanctl -l
-swanctl -L
-swanctl --log
-```
+    ```bash
+    sudo -i
+    swanctl -l
+    swanctl -L
+    swanctl --log
+    ```
 
 ## Развертывание IPsec Container Instance с помощью Terraform <a id="tf"/></a>
 
 1. Если у вас еще нет `Terraform`, [установите его и настройте провайдер Yandex Cloud](https://yandex.cloud/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform).
 
 2. Загрузить развертывание из репозитория на [github.com](https://github.com/yandex-cloud-examples/yc-ipsec-instance):
-```bash
-git clone https://github.com/yandex-cloud-examples/yc-ipsec-instance.git
-```
+    ```bash
+    git clone https://github.com/yandex-cloud-examples/yc-ipsec-instance.git
+    ```
 
 3. Перейти в папку с развертыванием 
-```bash
-cd yc-ipsec-instance
-```
+    ```bash
+    cd yc-ipsec-instance
+    ```
 
 4. Заполнить значения параметров развертывания в файле [terraform.tfvars](./terraform.tfvars)
 
@@ -229,21 +227,20 @@ cd yc-ipsec-instance
     ```bash
     terraform apply
     ```
+
 7. Привязать созданную таблицу маршрутизации VPC (на схеме обозначена как `ipsec-rt`) к нужным подсетям в сети `inside-net`.
 
 8. Проверить сетевую связность между локальными ресурсами (на схеме это подсети с CIDR 192.168.x.0/24) и удаленными ресурсами (на схеме это подсети с CIDR 10.10.x.0/24).
 
 9. В случае отсутствия сетевой связности между локальными и удаленными ресурсами необходимо подключиться к ВМ по SSH: 
-
-```bash
-ssh oper@<public-ip-1>
-```
+    ```bash
+    ssh oper@<public-ip-1>
+    ```
 
 и провести диагностику состояния `IPsec` соединения с помощью команд:
-
-```bash
-sudo -i
-swanctl -l
-swanctl -L
-swanctl --log
-```
+    ```bash
+    sudo -i
+    swanctl -l
+    swanctl -L
+    swanctl --log
+    ```
