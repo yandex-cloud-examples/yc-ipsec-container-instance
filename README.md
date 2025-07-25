@@ -100,7 +100,7 @@
 4. [Создать таблицу маршрутизации VPC](https://yandex.cloud/docs/vpc/operations/static-route-create) с набором маршрутов (CIDR) подсетей на удаленной площадке и привязать ее к нужным подсетям в сети `inside-net`.
 
 5. [Создать виртуальную машину](https://yandex.cloud/docs/compute/operations/vm-create/create-linux-vm#console_1), используя параметры, описанные в разделе [подготовка к развертыванию](#prep), например:
-    * Образ загрузочного диска: `Marketplace -> IPsec инстанс`
+    * Образ загрузочного диска: `Marketplace -> IPsec Container Instance`
     * Вычислительные ресурсы: `Standard -> 2 vCPU 4ГБ RAM`
     * Сетевые настройки:
         * Сетевой интерфейс №0 (eth0):
