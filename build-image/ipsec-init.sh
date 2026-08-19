@@ -2,7 +2,7 @@
 
 # Query Metadata for deployment details:
 ADMIN_NAME=$(curl -s 169.254.169.254/latest/user-data | yq -r .users[0].name)
-exports=$(curl -s 169.254.169.254/latest/user-data | yq -r '.ipsec | to_entries[] | "export " + .key + "=" + (.value | tostring)')
+exports=$(curl -s -H "Metadata-Flavor:Google" http://169.254.169.254/computeMetadata/v1/instance/attributes/ipsec | yq -r 'to_entries[] | "export " + .key + "=" + (.value | tostring)')
 eval $exports
 
 # Add admin user to the docker group
