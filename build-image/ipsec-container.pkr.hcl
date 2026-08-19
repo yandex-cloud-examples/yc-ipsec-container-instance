@@ -32,7 +32,7 @@ variable "HOME_DIR" {
 source "yandex" "ipsec-container-instance" {
   folder_id           = "${var.YC_FOLDER_ID}"
   platform_id         = "standard-v3"
-  source_image_family = "ubuntu-2404-lts"
+  source_image_family = "ubuntu-2604-lts"
   ssh_username        = "ubuntu"
   use_ipv4_nat        = "true"
   image_description   = "IPsec Container Instance"
