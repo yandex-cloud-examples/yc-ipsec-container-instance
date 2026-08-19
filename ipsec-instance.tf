@@ -67,6 +67,13 @@ resource "yandex_vpc_security_group" "instance_sg" {
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description    = "ipsec"
+    protocol       = "UDP"
+    port           = "500"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     description    = "Permit ANY"
     protocol       = "ANY"
