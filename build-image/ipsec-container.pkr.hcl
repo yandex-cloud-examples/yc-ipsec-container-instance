@@ -20,7 +20,7 @@ variable "YC_SUBNET_ID" {
 
 variable "SWAN_VER" {
   type = string
-  default = "6.0.2"
+  default = "6.0.7"
 }
 
 variable "HOME_DIR" {
