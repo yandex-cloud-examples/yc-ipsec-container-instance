@@ -98,6 +98,17 @@ variable "vm_user_ssh_key_file" {
   default     = "~/.ssh/id_ed25519.pub"
 }
 
+variable "periodic_routes_update" {
+  description = "Enable auto-update ip routes update on VM when ipsec.remote_subnets was changed"
+  type        = string
+  default     = "false"
+}
+
+variable "web_hc" {
+  description = "Enable Web Health Check container during IPsec VM init process"
+  type        = string
+  default     = "false"
+}
 
 variable "ipsec" {
   description = "IPsec parameters"
@@ -112,7 +123,8 @@ variable "ipsec" {
       r_timeout      = string
       r_tries        = string
       r_base         = string
-  })
+    }
+  )
   default = {
     policy_name    = null
     remote_ip      = null

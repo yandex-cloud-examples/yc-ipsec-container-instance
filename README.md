@@ -48,7 +48,8 @@
 * Передача параметров для настройки `IPsec Container Instance` происходит с помощью [сервиса метаданных ВМ](https://yandex.cloud/docs/compute/concepts/metadata/sending-metadata). Список параметров зависит от выбранного инструмента развертывания (Web-UI, yc-CLI, Terraform).
 * Для направления сетевого трафика к подсетям на удаленной площадке из отдельной подсети в Yandex Cloud, необходимо привязать таблицу маршрутизации `ipsec-rt` к этой подсети. В противном случае трафик в ВМ с `IPsec Container Instance` направляться не будет.
 * В данном развертывании ПО `strongSwan` запускается внутри ВМ `IPsec Container Instance` в виде docker контейнера.
-* При изменении списка подсетей в параметре `remote_subnets` метаданных ВМ, эти изменения будут автоматически приводить к изменению набора статических маршрутов на уровне ВМ.
+* При изменении списка подсетей в параметре `remote_subnets` метаданных ВМ, эти изменения могут автоматически изменять набор статических маршруты на уровне ВМ при установке параметра `periodic_routes_update` в значение `true`. В данном примере развертывания отключено (`false`).
+* Есть возможность запустить на ВМ отдельный контейнер с Web-сервером NGINX для реализации функции Health Check, который используется при реализации [отказоустойчивого развертывания IPsec](https://github.com/yandex-cloud-examples/yc-ipsec-ha-gateway). Для включения функции необходимо установить параметр `web_hc` в значение `true`. В данном примере развертывания отключено (`false`).
 
 ## Подготовка к развертыванию <a id="prep"/></a>
 
@@ -79,16 +80,20 @@
     r_timeout: 3.0
     r_tries: 3
     r_base: 1.0
+    periodic_routes_update: false
+    web_hc: false
     ```
 
     где,
     * `policy_name` -  название соединения IPsec в конфигурации strongSwan.
     * `remote_ip` - публичный IPv4 адрес IPsec шлюза удаленной площадки. На схеме обозначен как `public-ip-2`.
     * `preshared_key` - ключ шифрования для организации IPsec соединения. Должен быть одинаковым с обеих сторон соединения.
-    * `remote_subnets` - набор IPv4 префиксов подсетей со стороны удаленной площадки, которые будут доступны через IPsec соединение в Yandex Cloud
+    * `remote_subnets` - набор IPv4 префиксов подсетей со стороны удаленной площадки, которые будут доступны через IPsec соединение в Yandex Cloud.
     * `ike_proposal` - [шифр для IKE proposal](https://docs.strongswan.org/docs/latest/config/proposals.html).
     * `esp_proposal` - [шифр для ESP proposal](https://docs.strongswan.org/docs/latest/config/proposals.html).
     * `r_timeout`, `r_tries`, `r_base` - параметры [Retransmission timeouts](https://docs.strongswan.org/docs/latest/config/retransmission.html) для IPsec соединения.
+    * `periodic_routes_update` - включение автоматического обновление таблицы маршрутизации ВМ при изменениях в remote_subnets (true/false).
+    * `web_hc` - включение функции Web Health Check (true/false).
 
 
 ## Развертывание IPsec Container Instance с помощью Web-UI <a id="web"/></a>
@@ -138,6 +143,8 @@
             r_timeout: 3.0
             r_tries: 3
             r_base: 1.0
+            periodic_routes_update: false
+            web_hc: false
             ```
     * Нажать на кнопку "Создать ВМ".
 
@@ -145,7 +152,7 @@
     ```bash
     ssh oper@<public-ip-1>
     sudo -i
-    /usr/local/bin/ipsec-init.sh
+    /usr/local/bin/host-init.sh
     ```
 
 7. Проверить сетевую связность между локальными ресурсами (на схеме это подсети с CIDR 192.168.x.0/24) и удаленными ресурсами (на схеме это подсети с CIDR 10.10.x.0/24).
@@ -159,23 +166,28 @@
 
     ```bash
     sudo -i
-    swanctl -l
-    swanctl -L
-    swanctl --log
+    # Посмотреть логи контейнера, в котором запущен strongSwan:
+    docker logs strongswan
+
+    # Показать параметры IPsec соединений из конфигурации strongSwan:
+    docker exec -it strongswan swanctl -L
+
+    # Показать активные Security Associations (IKE_SAs)
+    docker exec -it strongswan swanctl -l
     ```
 
 ## Развертывание IPsec Container Instance с помощью YC-CLI <a id="cli"/></a>
 
 1. Если у вас еще нет интерфейса командной строки `YC-CLI`, [установите и инициализируйте его](https://yandex.cloud/docs/cli/quickstart#install).
 
-2. Загрузить развертывание из репозитория на [github.com](https://github.com/yandex-cloud-examples/yc-ipsec-instance):
+2. Загрузить развертывание из репозитория на [github.com](https://github.com/yandex-cloud-examples/yc-ipsec-container-instance):
     ```bash
-    git clone https://github.com/yandex-cloud-examples/yc-ipsec-instance.git
+    git clone https://github.com/yandex-cloud-examples/yc-ipsec-container-instance.git
     ```
 
 3. Перейти в папку с развертыванием 
     ```bash
-    cd yc-ipsec-instance
+    cd yc-ipsec-container-instance
     ```
 
 4. Заполнить значения параметров развертывания в файле [ipsec-cli-deploy.sh](./ipsec-cli-deploy.sh)
@@ -202,10 +214,15 @@
     и провести диагностику состояния `IPsec` соединения с помощью команд:
 
     ```bash
-    sudo -i
-    swanctl -l
-    swanctl -L
-    swanctl --log
+    sudo -i  
+    # Посмотреть логи контейнера, в котором запущен strongSwan:
+    docker logs strongswan
+
+    # Показать параметры IPsec соединений из конфигурации strongSwan:
+    docker exec -it strongswan swanctl -L
+
+    # Показать активные Security Associations (IKE_SAs)
+    docker exec -it strongswan swanctl -l
     ```
 
 ## Развертывание IPsec Container Instance с помощью Terraform <a id="tf"/></a>
@@ -214,12 +231,12 @@
 
 2. Загрузить развертывание из репозитория на [github.com](https://github.com/yandex-cloud-examples/yc-ipsec-instance):
     ```bash
-    git clone https://github.com/yandex-cloud-examples/yc-ipsec-instance.git
+    git clone https://github.com/yandex-cloud-examples/yc-ipsec-container-instance.git
     ```
 
 3. Перейти в папку с развертыванием 
     ```bash
-    cd yc-ipsec-instance
+    cd yc-ipsec-container-instance
     ```
 
 4. Заполнить значения параметров развертывания в файле [terraform.tfvars](./terraform.tfvars)
@@ -247,8 +264,13 @@
     и провести диагностику состояния `IPsec` соединения с помощью команд:
 
     ```bash
-    sudo -i
-    swanctl -l
-    swanctl -L
-    swanctl --log
-    ```
+   sudo -i
+    # Посмотреть логи контейнера, в котором запущен strongSwan:
+    docker logs strongswan
+
+    # Показать параметры IPsec соединений из конфигурации strongSwan:
+    docker exec -it strongswan swanctl -L
+
+    # Показать активные Security Associations (IKE_SAs)
+    docker exec -it strongswan swanctl -l
+     ```

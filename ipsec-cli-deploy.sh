@@ -44,6 +44,10 @@ export ESP_PROPOSAL=aes128gcm16
 export R_TIMEOUT=3.0
 export R_TRIES=3
 export R_BASE=1.0
+# Periodic routes update enabled
+export PERIODIC_ROUTES_UPDATE=false
+# Web-HC enable
+export WEB_HC=false
 
 # Create VPC Route table with remote subnets CIDR's
 INSIDE_NET_ID=$(yc vpc network get $INSIDE_NET_NAME --jq .id)

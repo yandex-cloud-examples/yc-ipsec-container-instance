@@ -14,4 +14,4 @@ users:
 runcmd:
   - sleep 1
   - sudo -i
-  - /usr/local/bin/ipsec-init.sh
+  - /usr/local/bin/host-init.sh

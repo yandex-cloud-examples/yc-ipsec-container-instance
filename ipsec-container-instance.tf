@@ -1,18 +1,19 @@
 
 // Get VM image Id for IPsec Container Instance deployment
 data "yandex_compute_image" "instance_image" {
-  folder_id = var.folder_id
-  family    = var.image_family
+  family = var.image_family
 }
 
 // Get Outside subnet for references
 data "yandex_vpc_subnet" "outside" {
-  name = var.outside_subnet
+  folder_id = var.folder_id
+  name      = var.outside_subnet
 }
 
 // Get Inside subnet for references
 data "yandex_vpc_subnet" "inside" {
-  name = var.inside_subnet
+  folder_id = var.folder_id
+  name      = var.inside_subnet
 }
 
 // Create VPC Route Table for route traffic
@@ -121,15 +122,17 @@ resource "yandex_compute_instance" "ipsec_instance" {
       USER_SSH_KEY = file(var.vm_user_ssh_key_file)
     }),
     ipsec = templatefile("${path.module}/ipsec.tpl", {
-      POLICY_NAME    = var.ipsec.policy_name
-      REMOTE_IP      = var.ipsec.remote_ip
-      IKE_PROPOSAL   = var.ipsec.ike_proposal
-      ESP_PROPOSAL   = var.ipsec.esp_proposal
-      PRESHARED_KEY  = var.ipsec.preshared_key
-      REMOTE_SUBNETS = replace(join(",", flatten(var.ipsec.remote_subnets)), " ", "")
-      R_TIMEOUT      = var.ipsec.r_timeout
-      R_TRIES        = var.ipsec.r_tries
-      R_BASE         = var.ipsec.r_base
+      POLICY_NAME            = var.ipsec.policy_name
+      REMOTE_IP              = var.ipsec.remote_ip
+      IKE_PROPOSAL           = var.ipsec.ike_proposal
+      ESP_PROPOSAL           = var.ipsec.esp_proposal
+      PRESHARED_KEY          = var.ipsec.preshared_key
+      REMOTE_SUBNETS         = replace(join(",", flatten(var.ipsec.remote_subnets)), " ", "")
+      R_TIMEOUT              = var.ipsec.r_timeout
+      R_TRIES                = var.ipsec.r_tries
+      R_BASE                 = var.ipsec.r_base
+      PERIODIC_ROUTES_UPDATE = var.periodic_routes_update
+      WEB_HC                 = var.web_hc
     })
   }
 }

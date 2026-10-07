@@ -14,3 +14,7 @@ esp_proposal: ${ESP_PROPOSAL}
 r_timeout: ${R_TIMEOUT}
 r_tries: ${R_TRIES}
 r_base: ${R_BASE}
+# Periodic routes update enabled
+periodic_routes_update: ${PERIODIC_ROUTES_UPDATE}
+# Web HC enabled
+web_hc: ${WEB_HC}

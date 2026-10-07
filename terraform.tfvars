@@ -1,9 +1,8 @@
-
 vm_name = "ipsec-gateway"
 sg_name = "ipsec-gateway-sg"
 rt_name = "ipsec-gateway-rt"
 
-vm_zone      = "ru-central1-a"
+vm_zone      = "ru-central1-d"
 vm_platform  = "standard-v3"
 vm_cores     = 2
 vm_memory    = 4
@@ -21,7 +20,7 @@ vm_user_ssh_key_file = "~/.ssh/id_ed25519.pub"
 
 ipsec = {
   policy_name    = "yc-ipsec"
-  remote_ip      = "x.x.x.x"
+  #remote_ip      = "x.x.x.x"
   ike_proposal   = "aes128gcm16-prfsha256-ecp256"
   esp_proposal   = "aes128gcm16"
   preshared_key  = "Sup@385paS4"
@@ -30,3 +29,6 @@ ipsec = {
   r_tries        = "3"
   r_base         = "1.0"
 }
+
+periodic_routes_update = "false"
+web_hc                 = "false"
